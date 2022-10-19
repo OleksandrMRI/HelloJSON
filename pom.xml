@@ -24,15 +24,15 @@
     </properties>
 
     <dependencies>
+<!--        <dependency>-->
+<!--            <groupId>com.fasterxml.jackson.core</groupId>-->
+<!--            <artifactId>jackson-databind</artifactId>-->
+<!--            <version>${jackson-databind}</version>-->
+<!--        </dependency>-->
         <dependency>
             <groupId>com.fasterxml.jackson.dataformat</groupId>
             <artifactId>jackson-dataformat-xml</artifactId>
             <version>${jackson-dataformat-xml}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson-databind}</version>
         </dependency>
         <dependency>
             <groupId>ch.qos.logback</groupId>
@@ -52,9 +52,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
+                <version>3.3.0</version>
                 <executions>
                     <execution>
-                        <phase>package</phase>
+                        <phase>${shade.phase}</phase>
                         <goals>
                             <goal>shade</goal>
                         </goals>
@@ -83,7 +84,7 @@
                         </goals>
                         <configuration>
                             <descriptors>
-                                <descriptor>src/main/resources/assembly-descr.xml</descriptor>
+                                <descriptor>src/main/resources/assembly-descr-${assembly.env}.xml</descriptor>
                             </descriptors>
                             <appendAssemblyId>false</appendAssemblyId>
                         </configuration>
@@ -93,6 +94,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-jar-plugin</artifactId>
+                <version>3.3.0</version>
                 <configuration>
                     <archive>
                         <manifest>
@@ -100,30 +102,45 @@
                             <classpathPrefix>lib</classpathPrefix>
                             <mainClass>ua.shpp.hellojson.Main</mainClass>
                         </manifest>
+                        <manifestEntries>
+                            <Class-Path>conf/</Class-Path>
+                        </manifestEntries>
                     </archive>
+                    <excludes>
+                        <exclude>**/logback.xml</exclude>
+                    </excludes>
                     <!--                    <excludes>-->
                     <!--                        <exclude>-->
                     <!--                            ${project.build.directory}/conf/config.properties-->
                     <!--                        </exclude>-->
                     <!--                    </excludes>-->
                 </configuration>
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        &lt;!&ndash;suppress UnresolvedMavenProperty &ndash;&gt;-->
+<!--                        <phase>${jar.phase}</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>jar</goal>-->
+<!--                        </goals>-->
+<!--                    </execution>-->
+<!--                </executions>-->
             </plugin>
-            <plugin>
-                <groupId>org.codehaus.mojo</groupId>
-                <artifactId>properties-maven-plugin</artifactId>
-                <version>${properties-maven-plugin.version}</version>
-                <executions>
-                    <execution>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>write-project-properties</goal>
-                        </goals>
-                        <configuration>
-                            <outputFile>${project.build.directory}/config.properties</outputFile>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
+<!--            <plugin>-->
+<!--                <groupId>org.codehaus.mojo</groupId>-->
+<!--                <artifactId>properties-maven-plugin</artifactId>-->
+<!--                <version>${properties-maven-plugin.version}</version>-->
+<!--                <executions>-->
+<!--                    <execution>-->
+<!--                        <phase>generate-resources</phase>-->
+<!--                        <goals>-->
+<!--                            <goal>write-project-properties</goal>-->
+<!--                        </goals>-->
+<!--                        <configuration>-->
+<!--                            <outputFile>${project.build.directory}/config.properties</outputFile>-->
+<!--                        </configuration>-->
+<!--                    </execution>-->
+<!--                </executions>-->
+<!--            </plugin>-->
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>properties-maven-plugin</artifactId>
@@ -140,15 +157,36 @@
                     </execution>
                 </executions>
             </plugin>
+
         </plugins>
-        <!--        <resources>-->
-        <!--            <resource>-->
-        <!--                <directory>src/main/resorces</directory>-->
-        <!--                <filtering>true</filtering>-->
-        <!--                <excludes>-->
-        <!--                    <exclude>**/*</exclude>-->
-        <!--                </excludes>-->
-        <!--            </resource>-->
-        <!--        </resources>-->
+<!--        <resources>-->
+<!--            <resource>-->
+<!--                <directory>src/main/resources</directory>-->
+<!--                <filtering>true</filtering>-->
+<!--                <excludes>-->
+<!--                    <exclude>**/logback.xml</exclude>-->
+<!--                </excludes>-->
+<!--            </resource>-->
+<!--        </resources>-->
     </build>
+    <profiles>
+        <profile>
+            <id>fat</id>
+            <activation>
+                <activeByDefault>true</activeByDefault>
+            </activation>
+            <properties>
+                <assembly.env>fat</assembly.env>
+                <shade.phase>package</shade.phase>
+            </properties>
+        </profile>
+        <profile>
+            <id>thin</id>
+            <properties>
+                <assembly.env>thin</assembly.env>
+                <shade.phase>none</shade.phase>
+
+            </properties>
+        </profile>
+    </profiles>
 </project>
