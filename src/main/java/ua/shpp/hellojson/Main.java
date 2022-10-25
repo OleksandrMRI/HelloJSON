@@ -25,7 +25,7 @@ public class Main implements Constants{
             log.error("There is no file \"config.properties\" in root catalog");
         }
 
-        String messageHello = "Привіт  !" + properties.getProperty("username") + "!";
+        String messageHello = "Привіт  !!" + properties.getProperty("username") + "!";
         Message message = new Message(messageHello);
         if(new File(OUTPUT_JSON_FILE).exists()) {
             log.debug("Inside if statement OUTPUT_JSON_FILE)");
